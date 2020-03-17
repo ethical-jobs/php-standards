@@ -1,26 +1,26 @@
 {
-    "name": "ethicaljobs/standards",
-    "require": {
-        "php": ">=7.2",
-        "phpstan/phpstan": "^0.12.15",
-        "symfony/console": "^5.0",
-        "symfony/process": "^5.0",
-        "phpmd/phpmd": "^2.8",
-        "sebastian/phpcpd": "^5.0",
-        "squizlabs/php_codesniffer": "^3.5",
-        "slevomat/coding-standard": "^6.1"
-    },
-    "autoload": {
-        "psr-4": {
-            "EthicalJobs\\Standards\\": "src/"
-        }
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "config": {
-        "optimize-autoloader": true
-    },
-    "bin": [
-        "ej-standards.php"
-    ]
+  "name": "ethicaljobs/standards",
+  "require": {
+    "php": ">=7.2",
+    "phpstan/phpstan": "^0.12.15",
+    "symfony/console": "^5.0",
+    "symfony/process": "^5.0",
+    "phpmd/phpmd": "^2.8",
+    "sebastian/phpcpd": "^5.0",
+    "squizlabs/php_codesniffer": "^3.5",
+    "slevomat/coding-standard": "^6.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "EthicalJobs\\Standards\\": "src/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "optimize-autoloader": true
+  },
+  "bin": [
+    "ej-standards"
+  ]
 }
