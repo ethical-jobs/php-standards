@@ -111,7 +111,15 @@ class ToolRunner extends Command
         foreach ($this->getToolProcesses() as $process) {
             if ($process->getProcess()->getExitCode() !== 0) {
                 $failed[] = \basename($process->getName());
+            } else {
+                $succeeded[] = \basename($process->getName());
             }
+        }
+
+        if (\count($succeeded) > 0) {
+            $symfonyStyle->note(
+                \sprintf('[%s] passed standards', \implode(', ', $succeeded))
+            );
         }
 
         $symfonyStyle->error(
