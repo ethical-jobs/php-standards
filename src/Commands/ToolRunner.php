@@ -21,7 +21,7 @@ class ToolRunner extends Command
     private $tools;
 
     /**
-     * LocalRunner constructor.
+     * ToolRunner constructor.
      *
      * @param ToolProcess[] $tools
      */
