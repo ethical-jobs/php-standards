@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class LocalRunner extends Command
+class ToolRunner extends Command
 {
     protected static $defaultName = 'run';
 
@@ -62,39 +62,40 @@ class LocalRunner extends Command
         $totalTools = count($this->getToolProcesses());
         $progressBar->setMaxSteps($totalTools);
 
-        // Setup a 'wait' for each tool process to render to output
         while (true) {
+            // Loop until all tools have completed execution
             foreach ($runningTools as $index => $tool) {
                 $section = $sections[$tool->getName()];
 
-                // Process has finished, but exit code was not 0
+                // Only when the tool process has finished running we care about the output
                 if ($tool->getProcess()->isRunning() === false) {
-
-                    $section->overwrite($tool->getProcess()->getOutput());
-
+                    // Keep a history of the resulting exit code
                     $exitCode = $tool->getProcess()->getExitCode();
                     $resultingExitCodes[$tool->getName()] = $exitCode;
 
-                    if ($exitCode === 0) {
-                        $section->clear();
+                    // Show output if the exit codes indicates not-successful
+                    if ($exitCode !== 0) {
+                        // Update the section contents with the process output
+                        $section->overwrite($tool->getProcess()->getOutput());
                     }
 
-                    $progressSection->clear();
                     $progressBar->advance();
 
                     unset($runningTools[$index]);
                 }
             }
 
+            // Exit while loop when no tools are left running, and remove progress indicator
             if (count($runningTools) === 0) {
                 $progressSection->clear();
                 break;
             }
 
-            // Sleep 100ms
+            // Sleep 100ms per iteration of process checks
             usleep(100000);
         }
 
+        // Determine the overall success
         $allToolsSuccessful = \array_sum($resultingExitCodes) === 0;
 
         if ($allToolsSuccessful === true) {
@@ -106,6 +107,7 @@ class LocalRunner extends Command
         }
 
         $failed = [];
+        // Determine which tools failed
         foreach ($this->getToolProcesses() as $process) {
             if ($process->getProcess()->getExitCode() !== 0) {
                 $failed[] = \basename($process->getName());

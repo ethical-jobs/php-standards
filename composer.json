@@ -1,8 +1,8 @@
 {
-  "name": "ethicaljobs/standards",
+  "name": "ethical-jobs/standards",
   "require": {
     "php": ">=7.2",
-    "phpstan/phpstan": "^0.12.15",
+    "phpstan/phpstan": "^0.12",
     "symfony/console": "^5.0",
     "symfony/process": "^5.0",
     "phpmd/phpmd": "^2.8",
@@ -21,6 +21,6 @@
     "optimize-autoloader": true
   },
   "bin": [
-    "ej-standards"
+    "standards"
   ]
 }

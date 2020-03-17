@@ -8,8 +8,13 @@ Exists to:
 Does not exist to:
 - Wrap the execution on the build server
 
-## The Standards
+## Usage
+```
+composer require --dev ethicaljobs/standards
+vendor/bin/ej-standards run
+```
 
+## The Standards
 
 
 ### PHP Mess Detector
@@ -25,9 +30,6 @@ Useful for determining edge-cases, un-usable code paths, ...
 
 ## Runners
 This standards package comes with two runners for running the standards suite.
-
-### Local
-Ideal way of running the standards suite, however no context is provided with the Drone configuration - which means the results may not match the build pipeline.
 
 ### Assumptions
 - drone-cli is installed
