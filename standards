@@ -1,20 +1,26 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
-use Symfony\Component\Console\Application;
 use EthicalJobs\Standards\Commands\ToolRunner;
 use EthicalJobs\Standards\ToolProcess;
+use Symfony\Component\Console\Application;
 
-require __DIR__.'/vendor/autoload.php';
+$isDependedOn = \is_file(__DIR__ . '/../../autoload.php') === true;
 
-$getPath = static function(array $path): string
-{
-    return \implode(\DIRECTORY_SEPARATOR, \array_merge([__DIR__], $path));
+$baseDir = \realpath(__DIR__);
+if ($isDependedOn === true) {
+    $baseDir = \realpath(__DIR__ . '/../../../');
+}
+
+require($baseDir . '/vendor/autoload.php');
+
+$getStandardsPath = static function (array $path): string {
+    \array_unshift($path, __DIR__);
+    return \implode(\DIRECTORY_SEPARATOR, $path);
 };
 
-$getVendorBin = static function (string $tool) use ($getPath): string
-{
-    return $getPath(['vendor', 'bin', $tool]);
+$getVendorBin = static function (string $tool) use ($baseDir): string {
+    return \implode(\DIRECTORY_SEPARATOR, [$baseDir, 'vendor', 'bin', $tool]);
 };
 
 foreach (['app', 'src'] as $sourceDirectory) {
@@ -28,9 +34,12 @@ if ($directory === null) {
     throw new RuntimeException('Could not determine which directory [app, src] to perform standards against');
 }
 
-$phpcs = new ToolProcess($getVendorBin('phpcs'), ['--colors', $directory, '--standard=' . $getPath(['config', 'phpcs.xml'])]);
-$phpmd = new ToolProcess($getVendorBin('phpmd'), [$directory, 'text', 'cleancode,codesize,controversial,design,naming,unusedcode']);
-$phpstan = new ToolProcess($getVendorBin('phpstan'), ['analyse', '--level=max', '--no-progress', '-c' . $getPath(['config', 'phpstan.neon']), $directory]);
+$phpcs = new ToolProcess($getVendorBin('phpcs'),
+    ['--colors', $directory, '--standard=' . $getStandardsPath(['config', 'phpcs.xml'])]);
+$phpmd = new ToolProcess($getVendorBin('phpmd'),
+    [$directory, 'text', 'cleancode,codesize,controversial,design,naming,unusedcode']);
+$phpstan = new ToolProcess($getVendorBin('phpstan'),
+    ['analyse', '--level=max', '--no-progress', '-c' . $getStandardsPath(['config', 'phpstan.neon']), $directory]);
 $phpcpd = new ToolProcess($getVendorBin('phpcpd'), [$directory]);
 
 $application = new Application();
