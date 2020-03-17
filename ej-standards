@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+use Symfony\Component\Console\Application;
+use EthicalJobs\Standards\Commands\LocalRunner;
+use EthicalJobs\Standards\ToolProcess;
+
+require __DIR__.'/vendor/autoload.php';
+
+$getPath = static function(array $path): string
+{
+    return \implode(\DIRECTORY_SEPARATOR, \array_merge([__DIR__], $path));
+};
+
+$getVendorBin = static function (string $tool) use ($getPath): string
+{
+    return $getPath(['vendor', 'bin', $tool]);
+};
+
+foreach (['app', 'src'] as $sourceDirectory) {
+    $directory = \implode(\DIRECTORY_SEPARATOR, [\getcwd(), $sourceDirectory]);
+
+    if (\is_dir($directory) === true) {
+        break;
+    }
+}
+if ($directory === null) {
+    throw new RuntimeException('Could not determine which directory [app, src] to perform standards against');
+}
+
+$phpcs = new ToolProcess($getVendorBin('phpcs'), ['--colors', $directory, '--standard=' . $getPath(['config', 'phpcs.xml'])]);
+$phpmd = new ToolProcess($getVendorBin('phpmd'), [$directory, 'text', 'cleancode,codesize,controversial,design,naming,unusedcode']);
+$phpstan = new ToolProcess($getVendorBin('phpstan'), ['analyse', '--level=max', '--no-progress', '-c' . $getPath(['config', 'phpstan.neon']), $directory]);
+$phpcpd = new ToolProcess($getVendorBin('phpcpd'), [$directory]);
+
+$application = new Application();
+$application->add(
+    new LocalRunner(\compact('phpcs', 'phpmd', 'phpstan', 'phpcpd'))
+);
+
+$application->run();
