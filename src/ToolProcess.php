@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace EthicalJobs\Standards;
@@ -11,7 +12,7 @@ use Symfony\Component\Process\Process;
 class ToolProcess
 {
     /**
-     * @var Process
+     * @var \Symfony\Component\Process\Process
      */
     private $process;
 
@@ -33,9 +34,9 @@ class ToolProcess
         $this->process = new Process(
             \array_merge(
                 [$binary],
-                $arguments
+                $arguments ?? []
             ),
-            \getcwd()
+            \getcwd() ?: __DIR__
         );
     }
 
