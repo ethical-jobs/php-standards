@@ -12,6 +12,11 @@ use Symfony\Component\Process\Process;
 class ToolProcess
 {
     /**
+     * @var array|null
+     */
+    private $arguments;
+
+    /**
      * @var \Symfony\Component\Process\Process
      */
     private $process;
@@ -21,7 +26,6 @@ class ToolProcess
      */
     private $binary;
 
-
     /**
      * ToolProcess constructor.
      *
@@ -30,6 +34,7 @@ class ToolProcess
      */
     public function __construct(string $binary, ?array $arguments = null)
     {
+        $this->arguments = $arguments;
         $this->binary = $binary;
         $this->process = new Process(
             \array_merge(
@@ -38,6 +43,11 @@ class ToolProcess
             ),
             \getcwd() ?: __DIR__
         );
+    }
+
+    public function getArguments(): array
+    {
+        return $this->arguments ?? [];
     }
 
     public function getName(): string

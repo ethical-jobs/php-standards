@@ -77,28 +77,36 @@ class ToolRunner extends Command
         while (true) {
             // Loop until all tools have completed execution
             foreach ($runningTools as $index => $tool) {
+                $section = $sections[$tool->getName()];
+
                 // Only when the tool process has finished running we care about the output
-                if ($tool->getProcess()->isRunning() === true) {
-                    continue;
+                if ($tool->getProcess()->isRunning() === false) {
+
+                    // Keep a history of the resulting exit code
+                    $exitCode = $tool->getProcess()->getExitCode();
+                    $resultingExitCodes[$tool->getName()] = $exitCode;
+
+                    // Show output if the exit codes indicates not-successful
+                    if ($exitCode !== 0) {
+                        $section->writeln(
+                            \sprintf('<fg=blue;options=bold>%s %s</>',
+                                \basename($tool->getName()),
+                                \str_replace(
+                                    \getcwd(),
+                                    '.',
+                                    \implode(' ', $tool->getArguments())
+                                )
+                            )
+                        );
+
+                        // Update the section contents with the process output
+                        $section->write($tool->getProcess()->getOutput());
+                    }
+
+                    $progressBar->advance();
+
+                    unset($runningTools[$index]);
                 }
-
-                // Keep a history of the resulting exit code
-                $exitCode = $tool->getProcess()->getExitCode();
-                $resultingExitCodes[$tool->getName()] = $exitCode;
-
-                // Show output if the exit codes indicates not-successful
-                if ($exitCode !== 0) {
-                    $section = $sections[$tool->getName()];
-
-                    $section->writeln(\sprintf('<info>%s</info>', \basename($tool->getName())));
-
-                    // Update the section contents with the process output
-                    $section->write($tool->getProcess()->getOutput());
-                }
-
-                $progressBar->advance();
-
-                unset($runningTools[$index]);
             }
 
             // Exit while loop when no tools are left running, and remove progress indicator
